@@ -1,52 +1,38 @@
+pub type Solution = fn() -> Result<String, ()>;
+
 macro_rules! solution {
     ($input:ident, $pt1:ident, $pt2:ident) => {
-        pub const SOLUTION: Day = Day;
-        pub struct Day;
-
-        impl super::Solution for Day {
-            fn pt1(&self) -> Result<String, ()> {
-                $pt1($input)
+        pub const SOLUTION: [crate::Solution; 2] = [solution::part1, solution::part2];
+        mod solution {
+            pub fn part1() -> Result<String, ()> {
+                super::$pt1(super::$input)
             }
 
-            fn pt2(&self) -> Result<String, ()> {
-                $pt2($input)
+            pub fn part2() -> Result<String, ()> {
+                super::$pt2(super::$input)
             }
         }
     };
     ($input:ident, $pt1:ident) => {
-        pub const SOLUTION: Day = Day;
-        pub struct Day;
-
-        impl super::Solution for Day {
-            fn pt1(&self) -> Result<String, ()> {
-                $pt1($input)
+        pub const SOLUTION: [Solution; 2] = [solution::part1, solution::part2];
+        mod solution {
+            fn part1() -> Result<String, ()> {
+                super::$pt1(super::$input)
             }
 
-            fn pt2(&self) -> Result<String, ()> {
+            fn part2() -> Result<String, ()> {
                 todo!()
             }
         }
     };
 }
 
-pub mod day1;
-
-pub trait Solution {
-    fn pt1(&self) -> Result<String, ()>;
-    fn pt2(&self) -> Result<String, ()>;
-}
-
-pub const SOLUTIONS: &[&dyn Solution] = &[&day1::SOLUTION];
-
-pub fn run_solution(solution: &dyn Solution, part: u8) {
+pub fn run_solution(solution: [Solution; 2], part: u8) {
     use std::time::Instant;
+    let solution = solution[part as usize - 1];
 
     let now = Instant::now();
-    let result = match part {
-        1 => solution.pt1(),
-        2 => solution.pt2(),
-        _ => unimplemented!("part must be 1 or 2"),
-    };
+    let result = solution();
     let elapsed = now.elapsed();
     if let Ok(res) = result {
         println!("Solution for part {part} completed in {elapsed:.2?}:\n{res}");
@@ -54,3 +40,7 @@ pub fn run_solution(solution: &dyn Solution, part: u8) {
         println!("Solution for part {part} failed");
     }
 }
+
+pub mod day1;
+
+pub const SOLUTIONS: &[[Solution; 2]] = &[day1::SOLUTION];
