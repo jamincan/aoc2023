@@ -4,61 +4,65 @@ solution!(INPUT, pt1, pt2);
 
 fn pt1_parse(value: &str) -> Option<u32> {
     // Get iterator of decimal digits in the string
-    let mut digits = value.chars().filter_map(|c| c.to_digit(10));
-    let first = digits.next()?;
-    let last = digits.last().unwrap_or(first);
+    let first = value.chars().find_map(|c| c.to_digit(10))?;
+    let last = value.chars().rev().find_map(|c| c.to_digit(10))?;
     Some(first * 10 + last)
 }
 
 fn pt1(input: &str) -> Result<String, ()> {
-    let sum = input
+    input
         .lines()
         .map(pt1_parse)
         .try_fold(0, |sum, c| c.map(|c| sum + c))
-        .ok_or(())?;
-    Ok(format!("{sum}"))
+        .map(|sum| sum.to_string())
+        .ok_or(())
 }
 
-fn parse_digit(input: &str) -> Option<u32> {
-    let mut chars = input.chars();
-    if let Some(digit) = chars.next()?.to_digit(10) {
-        return Some(digit);
-    }
-    if input.starts_with("one") {
+fn parse_digit(input: &str, reverse: bool) -> Option<u32> {
+    let test_fn = if !reverse {
+        str::starts_with
+    } else {
+        str::ends_with
+    };
+    if test_fn(input, "one") || test_fn(input, "1") {
         Some(1)
-    } else if input.starts_with("two") {
+    } else if test_fn(input, "two") || test_fn(input, "2") {
         Some(2)
-    } else if input.starts_with("three") {
+    } else if test_fn(input, "three") || test_fn(input, "3") {
         Some(3)
-    } else if input.starts_with("four") {
+    } else if test_fn(input, "four") || test_fn(input, "4") {
         Some(4)
-    } else if input.starts_with("five") {
+    } else if test_fn(input, "five") || test_fn(input, "5") {
         Some(5)
-    } else if input.starts_with("six") {
+    } else if test_fn(input, "six") || test_fn(input, "6") {
         Some(6)
-    } else if input.starts_with("seven") {
+    } else if test_fn(input, "seven") || test_fn(input, "7") {
         Some(7)
-    } else if input.starts_with("eight") {
+    } else if test_fn(input, "eight") || test_fn(input, "8") {
         Some(8)
-    } else if input.starts_with("nine") {
+    } else if test_fn(input, "nine") || test_fn(input, "9") {
         Some(9)
     } else {
         None
     }
 }
 
-fn pt2_parse(value: &str) -> Option<u32> {
-    let mut input = value;
-    let mut digits = vec![];
-    while !input.is_empty() {
-        if let Some(digit) = parse_digit(input) {
-            digits.push(digit);
+fn pt2_parse(input: &str) -> Option<u32> {
+    let mut start = 0;
+    let mut end = input.len();
+    let mut first: Option<u32> = None;
+    while end > 0 || start < input.len() {
+        if let Some(f) = first {
+            if let Some(l) = parse_digit(&input[0..end], true) {
+                return Some(10 * f + l);
+            }
+            end -= 1;
+        } else {
+            first = parse_digit(&input[start..], false);
+            start += 1;
         }
-        input = &input[1..];
     }
-    let first = digits.first()?;
-    let last = digits.last().expect("first exists so last does too");
-    Some(10 * *first + *last)
+    return None;
 }
 
 fn pt2(input: &str) -> Result<String, ()> {
