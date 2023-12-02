@@ -5,8 +5,15 @@ pub const INPUT: &str = include_str!("input/day1.txt");
 solution!(INPUT, pt1, pt2);
 
 fn pt1_parse(value: &str) -> Result<u32> {
-    let first = value.chars().find_map(|c| c.to_digit(10)).with_context(|| format!("no first digit found in '{value}'"))?;
-    let last = value.chars().rev().find_map(|c| c.to_digit(10)).expect("first digit found, so last should succeed");
+    let first = value
+        .chars()
+        .find_map(|c| c.to_digit(10))
+        .with_context(|| format!("no first digit found in '{value}'"))?;
+    let last = value
+        .chars()
+        .rev()
+        .find_map(|c| c.to_digit(10))
+        .expect("first digit found, so last should succeed");
     Ok(first * 10 + last)
 }
 

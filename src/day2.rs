@@ -1,4 +1,4 @@
-use anyhow::{Context, Result, anyhow};
+use anyhow::{anyhow, Context, Result};
 
 pub const INPUT: &str = include_str!("input/day2.txt");
 
@@ -12,14 +12,18 @@ struct Game {
 
 fn parse_game(input: &str) -> Result<Game> {
     let input = input.trim();
-    let input = if input.starts_with("Game ") {
-        &input[5..]
-    } else {
-        return Err(anyhow!("unable to remove game prefix from '{input}'"));
-    };
-    let (id, input) = input.split_once(": ").with_context(|| format!("unable to split id from colours for '{input}'"))?;
+    let input = input
+        .strip_prefix("Game ")
+        .with_context(|| format!("unable to remove game prefix from '{input}'"))?;
+    let (id, input) = input
+        .split_once(": ")
+        .with_context(|| format!("unable to split id from colours for '{input}'"))?;
     let id = id.parse::<u32>()?;
-    let sets: Vec<(u32, u32, u32)> = input.split("; ").map(parse_set).collect::<Result<_>>().with_context(|| format!("invalid set in {input}"))?;
+    let sets: Vec<(u32, u32, u32)> = input
+        .split("; ")
+        .map(parse_set)
+        .collect::<Result<_>>()
+        .with_context(|| format!("invalid set in {input}"))?;
     Ok(Game { id, sets })
 }
 
@@ -27,7 +31,9 @@ fn parse_set(input: &str) -> Result<(u32, u32, u32)> {
     let (mut r, mut g, mut b) = (0, 0, 0);
     let cubes = input.split(", ");
     for cube in cubes {
-        let (count, colour) = cube.split_once(' ').with_context(|| format!("unable to split count from colour for cube '{cube}'"))?;
+        let (count, colour) = cube
+            .split_once(' ')
+            .with_context(|| format!("unable to split count from colour for cube '{cube}'"))?;
         let count = count.parse::<u32>()?;
         match colour {
             "red" => r += count,
@@ -44,16 +50,15 @@ fn pt1(input: &str) -> Result<u32> {
     const G_MAX: u32 = 13;
     const B_MAX: u32 = 14;
     let games: Vec<Game> = input.lines().map(parse_game).collect::<Result<_>>()?;
-    Ok(
-        games
-            .into_iter()
-            .filter(|Game { sets, .. }| {
-                sets.iter()
-                    .all(|(r, g, b)| *r <= R_MAX && *g <= G_MAX && *b <= B_MAX)
-            })
-            .map(|Game { id, .. }| id)
-            .sum(),
-    )
+    Ok(games
+        .into_iter()
+        .filter(|game| {
+            game.sets
+                .iter()
+                .all(|(r, g, b)| *r <= R_MAX && *g <= G_MAX && *b <= B_MAX)
+        })
+        .map(|game| game.id)
+        .sum())
 }
 
 fn pt2(input: &str) -> Result<u32> {
@@ -61,12 +66,14 @@ fn pt2(input: &str) -> Result<u32> {
     games
         .iter()
         .map(|game| {
-            let min = game.sets
+            let min = game
+                .sets
                 .iter()
                 .copied()
                 .reduce(|(max_r, max_g, max_b), (r, g, b)| {
                     (r.max(max_r), g.max(max_g), b.max(max_b))
-                }).with_context(|| format!("no sets found for '{game:?}'"));
+                })
+                .with_context(|| format!("no sets found for '{game:?}'"));
             min
         })
         .try_fold(0, |sum, set| set.map(|(r, g, b)| sum + (r * g * b)))
