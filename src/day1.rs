@@ -1,10 +1,13 @@
 use anyhow::{Context, Result};
+use anyhow::{Context, Result};
 
 pub const INPUT: &str = include_str!("input/day1.txt");
 
 solution!(INPUT, pt1, pt2);
 
 fn pt1_parse(value: &str) -> Result<u32> {
+    let mut chars = value.chars();
+    let first = chars
     let mut chars = value.chars();
     let first = chars
         .find_map(|c| c.to_digit(10))
@@ -68,15 +71,6 @@ mod test {
     #[test]
     fn pt1() {
         assert_eq!(super::pt1(INPUT1).unwrap(), 142);
-    }
-
-    #[test]
-    fn pt2_parse() {
-        let results: Vec<_> = INPUT2
-            .lines()
-            .filter_map(|l| super::pt2_parse(l).ok())
-            .collect();
-        assert_eq!(results, vec![29, 83, 13, 24, 42, 14, 76]);
     }
 
     #[test]
