@@ -44,7 +44,4 @@ pub fn run_solution(solution: [Solution; 2], part: u8) {
 pub mod day1;
 pub mod day2;
 
-pub const SOLUTIONS: &[[Solution; 2]] = &[
-    day1::SOLUTION,
-    day2::SOLUTION,
-    ];
+pub const SOLUTIONS: &[[Solution; 2]] = &[day1::SOLUTION, day2::SOLUTION];
