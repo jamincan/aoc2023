@@ -1,14 +1,14 @@
-pub type Solution = fn() -> Option<String>;
+pub type Solution = fn() -> anyhow::Result<String>;
 
 macro_rules! solution {
     ($input:ident, $pt1:ident, $pt2:ident) => {
         pub const SOLUTION: [crate::Solution; 2] = [solution::part1, solution::part2];
         mod solution {
-            pub fn part1() -> Option<String> {
+            pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
             }
 
-            pub fn part2() -> Option<String> {
+            pub fn part2() -> anyhow::Result<String> {
                 super::$pt2(super::$input).map(|res| res.to_string())
             }
         }
@@ -16,11 +16,11 @@ macro_rules! solution {
     ($input:ident, $pt1:ident) => {
         pub const SOLUTION: [crate::Solution; 2] = [solution::part1, solution::part2];
         mod solution {
-            pub fn part1() -> Option<String> {
+            pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
             }
 
-            pub fn part2() -> Option<String> {
+            pub fn part2() -> anyhow::Result<String> {
                 todo!()
             }
         }
@@ -34,10 +34,9 @@ pub fn run_solution(solution: [Solution; 2], part: u8) {
     let now = Instant::now();
     let result = solution();
     let elapsed = now.elapsed();
-    if let Some(res) = result {
-        println!("Solution for part {part} completed in {elapsed:.2?}:\n{res}");
-    } else {
-        println!("Solution for part {part} failed");
+    match result {
+        Ok(res) => println!("Solution for part {part} completed in {elapsed:.2?}:\n{res}"),
+        Err(err) => println!("Solution for part {part} failed:\n{err}"),
     }
 }
 

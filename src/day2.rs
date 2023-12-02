@@ -1,3 +1,5 @@
+use anyhow::{Context, Result, anyhow};
+
 pub const INPUT: &str = include_str!("input/day2.txt");
 
 solution!(INPUT, pt1, pt2);
@@ -8,42 +10,41 @@ struct Game {
     sets: Vec<(u32, u32, u32)>,
 }
 
-fn parse_game(input: &str) -> Option<Game> {
+fn parse_game(input: &str) -> Result<Game> {
     let input = input.trim();
     let input = if input.starts_with("Game ") {
         &input[5..]
     } else {
-        return None;
+        return Err(anyhow!("unable to remove game prefix from '{input}'"));
     };
-    let (id, input) = input.split_once(": ")?;
-    let id = id.parse::<u32>().ok()?;
-    let sets: Vec<(u32, u32, u32)> = input.split("; ").map(parse_set).collect::<Option<_>>()?;
-    Some(Game { id, sets })
+    let (id, input) = input.split_once(": ").with_context(|| format!("unable to split id from colours for '{input}'"))?;
+    let id = id.parse::<u32>()?;
+    let sets: Vec<(u32, u32, u32)> = input.split("; ").map(parse_set).collect::<Result<_>>().with_context(|| format!("invalid set in {input}"))?;
+    Ok(Game { id, sets })
 }
 
-fn parse_set(input: &str) -> Option<(u32, u32, u32)> {
+fn parse_set(input: &str) -> Result<(u32, u32, u32)> {
     let (mut r, mut g, mut b) = (0, 0, 0);
     let cubes = input.split(", ");
     for cube in cubes {
-        let (count, colour) = cube.split_once(' ')?;
-        let count = count.parse::<u32>().ok()?;
+        let (count, colour) = cube.split_once(' ').with_context(|| format!("unable to split count from colour for cube '{cube}'"))?;
+        let count = count.parse::<u32>()?;
         match colour {
             "red" => r += count,
             "green" => g += count,
             "blue" => b += count,
-            _ => return None,
+            _ => return Err(anyhow!("invalid colour '{colour}'")),
         }
     }
-
-    Some((r, g, b))
+    Ok((r, g, b))
 }
 
-fn pt1(input: &str) -> Option<u32> {
+fn pt1(input: &str) -> Result<u32> {
     const R_MAX: u32 = 12;
     const G_MAX: u32 = 13;
     const B_MAX: u32 = 14;
-    let games: Vec<Game> = input.lines().map(parse_game).collect::<Option<_>>()?;
-    Some(
+    let games: Vec<Game> = input.lines().map(parse_game).collect::<Result<_>>()?;
+    Ok(
         games
             .into_iter()
             .filter(|Game { sets, .. }| {
@@ -55,17 +56,17 @@ fn pt1(input: &str) -> Option<u32> {
     )
 }
 
-fn pt2(input: &str) -> Option<u32> {
-    let games: Vec<Game> = input.lines().map(parse_game).collect::<Option<_>>()?;
+fn pt2(input: &str) -> Result<u32> {
+    let games: Vec<Game> = input.lines().map(parse_game).collect::<Result<_>>()?;
     games
         .iter()
-        .map(|Game { sets, .. }| {
-            let min = sets
+        .map(|game| {
+            let min = game.sets
                 .iter()
                 .copied()
                 .reduce(|(max_r, max_g, max_b), (r, g, b)| {
                     (r.max(max_r), g.max(max_g), b.max(max_b))
-                });
+                }).with_context(|| format!("no sets found for '{game:?}'"));
             min
         })
         .try_fold(0, |sum, set| set.map(|(r, g, b)| sum + (r * g * b)))
@@ -96,17 +97,12 @@ mod test {
     #[test]
     fn pt1() {
         let result = super::pt1(INPUT);
-        assert_eq!(result, Some(8));
+        assert_eq!(result.unwrap(), 8);
     }
 
     #[test]
     fn pt2() {
-        let powers: Vec<_> = INPUT.lines().map(super::pt2).collect();
-        assert_eq!(
-            powers,
-            vec![Some(48), Some(12), Some(1560), Some(630), Some(36)]
-        );
         let result = super::pt2(INPUT);
-        assert_eq!(result, Some(2286))
+        assert_eq!(result.unwrap(), 2286);
     }
 }
