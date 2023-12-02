@@ -1,13 +1,10 @@
 use anyhow::{Context, Result};
-use anyhow::{Context, Result};
 
 pub const INPUT: &str = include_str!("input/day1.txt");
 
 solution!(INPUT, pt1, pt2);
 
 fn pt1_parse(value: &str) -> Result<u32> {
-    let mut chars = value.chars();
-    let first = chars
     let mut chars = value.chars();
     let first = chars
         .find_map(|c| c.to_digit(10))
