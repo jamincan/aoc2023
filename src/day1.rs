@@ -9,13 +9,11 @@ fn pt1_parse(value: &str) -> Option<u32> {
     Some(first * 10 + last)
 }
 
-fn pt1(input: &str) -> Result<String, ()> {
+fn pt1(input: &str) -> Option<u32> {
     input
         .lines()
         .map(pt1_parse)
         .try_fold(0, |sum, c| c.map(|c| sum + c))
-        .map(|sum| sum.to_string())
-        .ok_or(())
 }
 
 fn parse_digit(input: &str, reverse: bool) -> Option<u32> {
@@ -65,13 +63,11 @@ fn pt2_parse(input: &str) -> Option<u32> {
     return None;
 }
 
-fn pt2(input: &str) -> Result<String, ()> {
-    let sum = input
+fn pt2(input: &str) -> Option<u32> {
+    input
         .lines()
         .map(pt2_parse)
         .try_fold(0, |sum, c| c.map(|c| sum + c))
-        .ok_or(())?;
-    Ok(format!("{sum}"))
 }
 
 #[cfg(test)]
@@ -91,11 +87,11 @@ mod test {
 
     #[test]
     fn pt1() {
-        assert_eq!(super::pt1(INPUT1), Ok(String::from("142")));
+        assert_eq!(super::pt1(INPUT1), Some(142));
     }
 
     #[test]
     fn pt2() {
-        assert_eq!(super::pt2(INPUT2), Ok(String::from("281")));
+        assert_eq!(super::pt2(INPUT2), Some(281));
     }
 }
