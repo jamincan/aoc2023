@@ -1,8 +1,9 @@
 pub type Solution = fn() -> anyhow::Result<String>;
+pub type SolutionSet = (Solution, Option<Solution>);
 
 macro_rules! solution {
     ($input:ident, $pt1:ident, $pt2:ident) => {
-        pub const SOLUTION: [crate::Solution; 2] = [solution::part1, solution::part2];
+        pub const SOLUTION: crate::SolutionSet = (solution::part1, Some(solution::part2));
         mod solution {
             pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
@@ -14,22 +15,23 @@ macro_rules! solution {
         }
     };
     ($input:ident, $pt1:ident) => {
-        pub const SOLUTION: [crate::Solution; 2] = [solution::part1, solution::part2];
+        pub const SOLUTION: crate::SolutionSet = (solution::part1, None)
         mod solution {
             pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
-            }
-
-            pub fn part2() -> anyhow::Result<String> {
-                todo!()
             }
         }
     };
 }
 
-pub fn run_solution(solution: [Solution; 2], part: u8) {
+pub fn run_solution(day: u8, part: u8) {
     use std::time::Instant;
-    let solution = solution[part as usize - 1];
+    let (pt1, pt2) = SOLUTIONS[day as usize - 1];
+    let solution = match part {
+        1 => pt1,
+        2 => pt2.expect("part 2 is not yet implemented"),
+        _ => panic!("part must be 1 or 2")
+    };
 
     let now = Instant::now();
     let result = solution();
@@ -43,4 +45,4 @@ pub fn run_solution(solution: [Solution; 2], part: u8) {
 pub mod day1;
 pub mod day2;
 
-pub const SOLUTIONS: &[[Solution; 2]] = &[day1::SOLUTION, day2::SOLUTION];
+pub const SOLUTIONS: &[SolutionSet] = &[day1::SOLUTION, day2::SOLUTION];

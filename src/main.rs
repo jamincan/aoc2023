@@ -26,6 +26,6 @@ fn main() {
         .collect::<Vec<_>>();
 
     for part in parts {
-        run_solution(SOLUTIONS[*day as usize - 1], *part);
+        run_solution(*day, *part);
     }
 }
