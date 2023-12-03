@@ -58,19 +58,18 @@ fn pt2(input: &str) -> Result<u32> {
 
     // map of each index associated with a * symbol and its gear count and calculated gear ratio 
     let mut possible_ratios = std::collections::BTreeMap::<usize, (u32, u32)>::new();
-    'outer: for m in digit.find_iter(&input) {
+    for m in digit.find_iter(&input) {
         let neighbours = neighbour_indices(m.start(), width, m.len());
         for neighbour in neighbours {
             if let Some('*') = chars.get(neighbour) {
                 let num = m.as_str().parse::<u32>()?;
-                let (count, _) = possible_ratios
+                possible_ratios
                     .entry(neighbour)
                     .and_modify(|(count, ratio)| {
                         *ratio *= num;
                         *count += 1;
                     })
                     .or_insert((1, num));
-                if *count > 2 { continue 'outer };
             }
         }
     }
