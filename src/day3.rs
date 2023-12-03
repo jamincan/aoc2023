@@ -19,7 +19,7 @@ fn neighbour_indices(current: usize, width: usize, num_len: usize) -> impl Itera
         .chain(next_row)
         .map(move |offset| current + offset)
         // Ignore indices < 0
-        .filter(|index| *index >= 0) // Add
+        .filter(|index| *index >= 0)
         // Ignore indices corresponding to a line break
         .filter(move |index| index % width != width - 1)
         .map(|index| index as usize)
