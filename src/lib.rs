@@ -15,7 +15,7 @@ macro_rules! solution {
         }
     };
     ($input:ident, $pt1:ident) => {
-        pub const SOLUTION: crate::SolutionSet = (solution::part1, None)
+        pub const SOLUTION: crate::SolutionSet = (solution::part1, None);
         mod solution {
             pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
@@ -30,7 +30,7 @@ pub fn run_solution(day: u8, part: u8) {
     let solution = match part {
         1 => pt1,
         2 => pt2.expect("part 2 is not yet implemented"),
-        _ => panic!("part must be 1 or 2")
+        _ => panic!("part must be 1 or 2"),
     };
 
     let now = Instant::now();
@@ -44,5 +44,6 @@ pub fn run_solution(day: u8, part: u8) {
 
 pub mod day1;
 pub mod day2;
+pub mod day3;
 
-pub const SOLUTIONS: &[SolutionSet] = &[day1::SOLUTION, day2::SOLUTION];
+pub const SOLUTIONS: &[SolutionSet] = &[day1::SOLUTION, day2::SOLUTION, day3::SOLUTION];
