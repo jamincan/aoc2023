@@ -56,25 +56,29 @@ fn pt2(input: &str) -> Result<u32> {
     let width = input.lines().next().context("input is empty")?.len() + 1; // Include newline
     let chars = input.chars().collect_vec();
 
-    // Find all numbers adjacent to '*'
-    let mut possible_gears = std::collections::BTreeMap::<usize, Vec<u32>>::new();
-    for m in digit.find_iter(&input) {
+    // map of each index associated with a * symbol and its gear count and calculated gear ratio 
+    let mut possible_ratios = std::collections::BTreeMap::<usize, (u32, u32)>::new();
+    'outer: for m in digit.find_iter(&input) {
         let neighbours = neighbour_indices(m.start(), width, m.len());
         for neighbour in neighbours {
             if let Some('*') = chars.get(neighbour) {
                 let num = m.as_str().parse::<u32>()?;
-                possible_gears
+                let (count, _) = possible_ratios
                     .entry(neighbour)
-                    .and_modify(|gears| gears.push(num))
-                    .or_insert(vec![num]);
+                    .and_modify(|(count, ratio)| {
+                        *ratio *= num;
+                        *count += 1;
+                    })
+                    .or_insert((1, num));
+                if *count > 2 { continue 'outer };
             }
         }
     }
 
-    Ok(possible_gears
+    Ok(possible_ratios
         .values()
-        .filter(|gears| gears.len() == 2)
-        .map(|gears| gears.iter().product::<u32>())
+        .filter(|(count, _)| *count == 2)
+        .map(|(_, ratio)| ratio)
         .sum::<u32>())
 }
 
