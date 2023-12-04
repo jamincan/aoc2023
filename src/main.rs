@@ -19,13 +19,14 @@ fn main() {
         )
         .get_matches();
 
-    let day = matches.get_one::<u8>("DAY").unwrap();
+    let day = *matches.get_one::<u8>("DAY").unwrap();
     let parts = matches
         .get_many::<u8>("part")
         .unwrap_or_default()
+        .copied()
         .collect::<Vec<_>>();
 
     for part in parts {
-        run_solution(*day, *part);
+        run_solution(day, part)
     }
 }

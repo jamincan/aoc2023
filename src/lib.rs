@@ -26,11 +26,14 @@ macro_rules! solution {
 
 pub fn run_solution(day: u8, part: u8) {
     use std::time::Instant;
-    let (pt1, pt2) = SOLUTIONS[day as usize - 1];
-    let solution = match part {
-        1 => pt1,
-        2 => pt2.expect("part 2 is not yet implemented"),
-        _ => panic!("part must be 1 or 2"),
+    let solution = match (part, SOLUTIONS[day as usize - 1]) {
+        (1, (pt1, _)) => pt1,
+        (2, (_, Some(pt2))) => pt2,
+        (2, (_, None)) => {
+            println!("Solution for part 2 not yet implemented");
+            return;
+        }
+        (_, _) => panic!("part must be 1 or 2"),
     };
 
     let now = Instant::now();
