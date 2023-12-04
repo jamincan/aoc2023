@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use anyhow::{Context, Result};
 
 pub const INPUT: &str = include_str!("input/day4.txt");
@@ -7,8 +5,8 @@ pub const INPUT: &str = include_str!("input/day4.txt");
 solution!(INPUT, pt1, pt2);
 
 struct Card {
-    winners: HashSet<u8>,
-    chosen: HashSet<u8>,
+    winners: Vec<u8>,
+    chosen: Vec<u8>,
 }
 
 fn parse_card(input: &str) -> Result<Card> {
@@ -24,7 +22,7 @@ fn parse_card(input: &str) -> Result<Card> {
     let (winners, chosen) = rest.split_once('|').with_context(|| {
         format!("missing | separator between winning numbers and chosen numbers for card '{input}'")
     })?;
-    let winners: HashSet<_> = winners
+    let winners: Vec<_> = winners
         .split_whitespace()
         .map(|num| {
             num.parse::<u8>()
@@ -33,7 +31,7 @@ fn parse_card(input: &str) -> Result<Card> {
         .collect::<Result<_>>()?;
 
     // Chosen numbers
-    let chosen: HashSet<_> = chosen
+    let chosen: Vec<_> = chosen
         .split_whitespace()
         .map(|num| {
             num.parse::<u8>()
@@ -48,8 +46,7 @@ fn winning_numbers_count(card: &Card) -> u32 {
     let Card {
         winners, chosen, ..
     } = card;
-
-    chosen.intersection(&winners).count() as u32
+    chosen.iter().filter(|num| winners.contains(*num)).count() as u32
 }
 
 fn pt1(input: &str) -> Result<u32> {
