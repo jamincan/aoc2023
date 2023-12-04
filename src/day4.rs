@@ -55,7 +55,7 @@ fn pt1(input: &str) -> Result<u32> {
         .iter()
         .map(winning_numbers_count)
         .filter(|count| *count > 0);
-    Ok(winning_cards.map(|count| 2u32.pow(count - 1)).sum::<u32>())
+    Ok(winning_cards.map(|count| 2u32.pow(count - 1)).sum())
 }
 
 fn pt2(input: &str) -> Result<u32> {
@@ -71,7 +71,7 @@ fn pt2(input: &str) -> Result<u32> {
         }
     }
 
-    Ok(card_counts.iter().sum::<u32>())
+    Ok(card_counts.iter().sum())
 }
 
 #[cfg(test)]
