@@ -43,9 +43,7 @@ fn parse_card(input: &str) -> Result<Card> {
 }
 
 fn winning_numbers_count(card: &Card) -> u32 {
-    let Card {
-        winners, chosen, ..
-    } = card;
+    let Card { winners, chosen } = card;
     chosen.iter().filter(|num| winners.contains(*num)).count() as u32
 }
 
