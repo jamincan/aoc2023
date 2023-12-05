@@ -51,16 +51,6 @@ pub fn include_aoc(input: TokenStream) -> TokenStream {
     TokenTree::Literal(proc_macro::Literal::string(&aoc_input)).into()
 }
 
-#[proc_macro]
-pub fn cache_dir(_input: TokenStream) -> TokenStream {
-    let dir = scratch::path("include_aoc");
-    let dir = dir
-        .as_os_str()
-        .to_str()
-        .expect("can't convert path to UTF-8");
-    TokenTree::Literal(proc_macro::Literal::string(dir)).into()
-}
-
 fn load_from_aoc(year: u32, day: u32) -> String {
     let _ = dotenv::dotenv();
 
