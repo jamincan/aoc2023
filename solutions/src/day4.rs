@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
+use include_aoc::include_aoc;
 
-pub const INPUT: &str = include_str!("input/day4.txt");
+static INPUT: &str = include_aoc!(2023, 4);
 
 solution!(INPUT, pt1, pt2);
 
@@ -84,12 +85,16 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
     #[test]
     fn pt1() {
         assert_eq!(super::pt1(INPUT).unwrap(), 13);
-        assert_eq!(super::pt1(super::INPUT).unwrap(), 18519);
     }
 
     #[test]
     fn pt2() {
         assert_eq!(super::pt2(INPUT).unwrap(), 30);
+    }
+
+    #[test]
+    fn real_input() {
+        assert_eq!(super::pt1(super::INPUT).unwrap(), 18519);
         assert_eq!(super::pt2(super::INPUT).unwrap(), 11787590);
     }
 }

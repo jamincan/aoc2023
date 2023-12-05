@@ -5,9 +5,7 @@ pub fn benchmark(c: &mut Criterion) {
     for (day, (pt1, pt2)) in SOLUTIONS.iter().enumerate() {
         let day = day + 1;
         c.bench_function(&format!("d{day}p1"), |b| b.iter(|| pt1()));
-        if let Some(pt2) = pt2 {
-            c.bench_function(&format!("d{day}p2"), |b| b.iter(|| pt2()));
-        }
+        c.bench_function(&format!("d{day}p2"), |b| b.iter(|| pt2()));
     }
 }
 

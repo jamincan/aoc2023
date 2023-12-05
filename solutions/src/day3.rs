@@ -1,7 +1,8 @@
 use anyhow::{Context, Result};
+use include_aoc::include_aoc;
 use itertools::Itertools;
 
-pub const INPUT: &str = include_str!("input/day3.txt");
+static INPUT: &str = include_aoc!(2023, 3);
 
 solution!(INPUT, pt1, pt2);
 
@@ -56,7 +57,7 @@ fn pt2(input: &str) -> Result<u32> {
     let width = input.lines().next().context("input is empty")?.len() + 1; // Include newline
     let chars = input.chars().collect_vec();
 
-    // map of each index associated with a * symbol and its gear count and calculated gear ratio 
+    // map of each index associated with a * symbol and its gear count and calculated gear ratio
     let mut possible_ratios = std::collections::BTreeMap::<usize, (u32, u32)>::new();
     for m in digit.find_iter(&input) {
         let neighbours = neighbour_indices(m.start(), width, m.len());
@@ -118,12 +119,16 @@ mod test {
     #[test]
     fn pt1() {
         assert_eq!(super::pt1(INPUT).unwrap(), 4361);
-        assert_eq!(super::pt1(super::INPUT).unwrap(), 544433);
     }
 
     #[test]
     fn pt2() {
         assert_eq!(super::pt2(INPUT).unwrap(), 467835);
+    }
+
+    #[test]
+    fn real_input() {
+        assert_eq!(super::pt1(super::INPUT).unwrap(), 544433);
         assert_eq!(super::pt2(super::INPUT).unwrap(), 76314915);
     }
 }

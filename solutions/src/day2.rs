@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Context, Result};
+use include_aoc::include_aoc;
 
-pub const INPUT: &str = include_str!("input/day2.txt");
+static INPUT: &str = include_aoc!(2023, 2);
 
 solution!(INPUT, pt1, pt2);
 

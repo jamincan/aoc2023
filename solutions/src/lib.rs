@@ -1,9 +1,9 @@
 pub type Solution = fn() -> anyhow::Result<String>;
-pub type SolutionSet = (Solution, Option<Solution>);
+pub type SolutionSet = (Solution, Solution);
 
 macro_rules! solution {
     ($input:ident, $pt1:ident, $pt2:ident) => {
-        pub const SOLUTION: crate::SolutionSet = (solution::part1, Some(solution::part2));
+        pub const SOLUTION: crate::SolutionSet = (solution::part1, solution::part2);
         mod solution {
             pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
@@ -14,11 +14,15 @@ macro_rules! solution {
             }
         }
     };
-    ($input:ident, $pt1:ident) => {
-        pub const SOLUTION: crate::SolutionSet = (solution::part1, None);
+    ($pt1:ident) => {
+        pub const SOLUTION: crate::SolutionSet = (solution::part1, solution::part2);
         mod solution {
             pub fn part1() -> anyhow::Result<String> {
                 super::$pt1(super::$input).map(|res| res.to_string())
+            }
+
+            pub fn part2() -> anyhow::Result<String> {
+                anyhow::bail!("Solution for part 2 not yet implemented")
             }
         }
     };
@@ -26,14 +30,12 @@ macro_rules! solution {
 
 pub fn run_solution(day: u8, part: u8) {
     use std::time::Instant;
-    let solution = match (part, SOLUTIONS[day as usize - 1]) {
-        (1, (pt1, _)) => pt1,
-        (2, (_, Some(pt2))) => pt2,
-        (2, (_, None)) => {
-            println!("Solution for part 2 not yet implemented");
-            return;
-        }
-        (_, _) => panic!("part must be 1 or 2"),
+    let (pt1, pt2) = SOLUTIONS[day as usize - 1];
+
+    let solution = match part {
+        1 => pt1,
+        2 => pt2,
+        _ => panic!("part must be 1 or 2"),
     };
 
     let now = Instant::now();

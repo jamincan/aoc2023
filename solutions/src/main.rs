@@ -19,6 +19,9 @@ fn main() {
         )
         .get_matches();
 
+    let dir = include_aoc::cache_dir!();
+    println!("Dir: {dir}");
+
     let day = *matches.get_one::<u8>("DAY").unwrap();
     let parts = matches
         .get_many::<u8>("part")
