@@ -1,6 +1,6 @@
 use std::str::Lines;
 
-use anyhow::{Context, Result, bail};
+use anyhow::{bail, Context, Result};
 use include_aoc::include_aoc;
 
 static INPUT: &str = include_aoc!(2023, 5);
@@ -39,9 +39,7 @@ impl Transformer {
 }
 
 fn parse_transformer(input: &mut Lines) -> Result<Transformer> {
-    let _header = input
-        .next()
-        .context("input is empty")?;
+    let _header = input.next().context("input is empty")?;
 
     let maps: Vec<_> = input
         .take_while(|line| !line.is_empty())
@@ -80,7 +78,9 @@ fn pt1(input: &str) -> Result<i64> {
     let mut lines = input.trim().lines();
     let mut seeds = parse_seed_section(&mut lines)?;
 
-    let _empty = lines.next().context("empty line between seeds and maps is missing")?;
+    let _empty = lines
+        .next()
+        .context("empty line between seeds and maps is missing")?;
 
     let mut transformers = Vec::new();
     while let Ok(transformer) = parse_transformer(&mut lines) {
@@ -99,9 +99,14 @@ fn pt1(input: &str) -> Result<i64> {
 fn pt2(input: &str) -> Result<i64> {
     let mut lines = input.trim().lines();
     let seed_nums = parse_seed_section(&mut lines)?;
-    let seed_ranges: Vec<_> = seed_nums.chunks_exact(2).map(|pair| pair[0]..pair[0] + pair[1]).collect();
+    let seed_ranges: Vec<_> = seed_nums
+        .chunks_exact(2)
+        .map(|pair| pair[0]..pair[0] + pair[1])
+        .collect();
 
-    let _empty = lines.next().context("empty line between seeds and maps is missing")?;
+    let _empty = lines
+        .next()
+        .context("empty line between seeds and maps is missing")?;
 
     let mut transformers = Vec::new();
     while let Ok(transformer) = parse_transformer(&mut lines) {
@@ -114,9 +119,11 @@ fn pt2(input: &str) -> Result<i64> {
         for transformer in transformers.iter().rev() {
             transformed = transformer.reverse(transformed);
         }
-        
+
         for range in seed_ranges.iter() {
-            if range.contains(&transformed) { return Ok(location as i64) }
+            if range.contains(&transformed) {
+                return Ok(location as i64);
+            }
         }
     }
 
