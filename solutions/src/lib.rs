@@ -52,6 +52,7 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod day6;
 
 pub const SOLUTIONS: &[SolutionSet] = &[
     day1::SOLUTION,
@@ -59,4 +60,5 @@ pub const SOLUTIONS: &[SolutionSet] = &[
     day3::SOLUTION,
     day4::SOLUTION,
     day5::SOLUTION,
+    day6::SOLUTION,
 ];
