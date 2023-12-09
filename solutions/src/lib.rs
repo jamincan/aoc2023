@@ -47,13 +47,14 @@ pub fn run_solution(day: u8, part: u8) {
     }
 }
 
-pub mod day1;
-pub mod day2;
-pub mod day3;
-pub mod day4;
-pub mod day5;
-pub mod day6;
-pub mod day7;
+mod day1;
+mod day2;
+mod day3;
+mod day4;
+mod day5;
+mod day6;
+mod day7;
+mod day8;
 
 pub const SOLUTIONS: &[SolutionSet] = &[
     day1::SOLUTION,
@@ -63,4 +64,5 @@ pub const SOLUTIONS: &[SolutionSet] = &[
     day5::SOLUTION,
     day6::SOLUTION,
     day7::SOLUTION,
+    day8::SOLUTION,
 ];
