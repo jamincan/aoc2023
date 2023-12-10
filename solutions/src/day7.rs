@@ -71,7 +71,10 @@ impl Hand {
         use HandType::*;
 
         let Hand { cards, .. } = *self;
-        let base_hand: Vec<Card> = cards.into_iter().filter(|card| *card != Card::Joker).collect();
+        let base_hand: Vec<Card> = cards
+            .into_iter()
+            .filter(|card| *card != Card::Joker)
+            .collect();
         let joker_count = 5 - base_hand.len();
         let base_hand_type = HandType::from(&base_hand[..]);
         match (base_hand_type, joker_count) {
@@ -153,8 +156,6 @@ impl From<&[Card]> for HandType {
         }
     }
 }
-
-
 
 fn calculate_winnings<const PART: u8>(input: &str) -> Result<i64> {
     let mut hands = parse_hands::<PART>(input)?;

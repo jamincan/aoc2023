@@ -42,7 +42,7 @@ enum RelativePosition {
     Right,
     Left,
     Loop,
-    Unknown
+    Unknown,
 }
 
 struct Map {
@@ -63,30 +63,49 @@ impl Map {
             .context("no starting position found")? as isize;
 
         // North
-        if let Some((Pipe::NS | Pipe::SE | Pipe::SW, _)) = self.pipes.get((start_idx - self.width) as usize) {
+        if let Some((Pipe::NS | Pipe::SE | Pipe::SW, _)) =
+            self.pipes.get((start_idx - self.width) as usize)
+        {
             return Ok((start_idx, start_idx - self.width));
         }
         // South
-        if let Some((Pipe::NS | Pipe::NE | Pipe::NW, _)) = self.pipes.get((start_idx + self.width) as usize) {
+        if let Some((Pipe::NS | Pipe::NE | Pipe::NW, _)) =
+            self.pipes.get((start_idx + self.width) as usize)
+        {
             return Ok((start_idx, start_idx + self.width));
         }
         // East
-        if start_idx + 1 % self.width != 0 && let Some((Pipe::EW | Pipe::NW | Pipe::SW, _)) = self.pipes.get(start_idx as usize + 1) {
+        if start_idx + 1 % self.width != 0
+            && let Some((Pipe::EW | Pipe::NW | Pipe::SW, _)) =
+                self.pipes.get(start_idx as usize + 1)
+        {
             return Ok((start_idx, start_idx + 1));
         }
         // West
-        if start_idx % self.width != 0 && let Some((Pipe::EW | Pipe::NE | Pipe::SE, _)) = self.pipes.get(start_idx as usize - 1) {
+        if start_idx % self.width != 0
+            && let Some((Pipe::EW | Pipe::NE | Pipe::SE, _)) =
+                self.pipes.get(start_idx as usize - 1)
+        {
             return Ok((start_idx, start_idx - 1));
         }
         bail!("no paths found from starting position");
     }
 
-    fn set_relative_position(&mut self, origin: isize, index: isize, relative_position: RelativePosition) {
+    fn set_relative_position(
+        &mut self,
+        origin: isize,
+        index: isize,
+        relative_position: RelativePosition,
+    ) {
         // Return early if east-west index shift moves it north or south
         let from_east = index - origin == -1;
         let from_west = index - origin == 1;
-        if from_east && origin % self.width == 0 { return };
-        if from_west && index % self.width == 0 { return };
+        if from_east && origin % self.width == 0 {
+            return;
+        };
+        if from_west && index % self.width == 0 {
+            return;
+        };
 
         match self.pipes.get_mut(index as usize) {
             Some((_, RelativePosition::Loop)) => return, // If already marked as loop, don't overwrite
@@ -108,76 +127,78 @@ impl Map {
                 self.set_relative_position(current, current - 1, RelativePosition::Right);
                 self.set_relative_position(current, current + 1, RelativePosition::Left);
                 current + self.width
-            },
+            }
             Pipe::NS if from_south => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current + 1, RelativePosition::Right);
                 self.set_relative_position(current, current - 1, RelativePosition::Left);
                 current - self.width
-            },
+            }
             Pipe::EW if from_east => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current - self.width, RelativePosition::Right);
                 self.set_relative_position(current, current + self.width, RelativePosition::Left);
                 current - 1
-            },
+            }
             Pipe::EW if from_west => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current + self.width, RelativePosition::Right);
                 self.set_relative_position(current, current - self.width, RelativePosition::Left);
                 current + 1
-            },
+            }
             Pipe::NE if from_north => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current - 1, RelativePosition::Right);
                 self.set_relative_position(current, current + self.width, RelativePosition::Right);
                 current + 1
-            },
+            }
             Pipe::NE if from_east => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current - 1, RelativePosition::Left);
                 self.set_relative_position(current, current + self.width, RelativePosition::Left);
                 current - self.width
-            },
+            }
             Pipe::NW if from_north => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current + 1, RelativePosition::Left);
                 self.set_relative_position(current, current + self.width, RelativePosition::Left);
                 current - 1
-            },
+            }
             Pipe::NW if from_west => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current + 1, RelativePosition::Right);
                 self.set_relative_position(current, current + self.width, RelativePosition::Right);
                 current - self.width
-            },
+            }
             Pipe::SE if from_south => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current - 1, RelativePosition::Left);
                 self.set_relative_position(current, current - self.width, RelativePosition::Left);
                 current + 1
-            },
+            }
             Pipe::SE if from_east => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current - 1, RelativePosition::Right);
                 self.set_relative_position(current, current - self.width, RelativePosition::Right);
                 current + self.width
-            },
+            }
             Pipe::SW if from_south => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current + 1, RelativePosition::Right);
                 self.set_relative_position(current, current - self.width, RelativePosition::Right);
                 current - 1
-            },
+            }
             Pipe::SW if from_west => {
                 *rel_pos = RelativePosition::Loop;
                 self.set_relative_position(current, current + 1, RelativePosition::Left);
                 self.set_relative_position(current, current - self.width, RelativePosition::Left);
                 current + self.width
-            },
+            }
             _ => return None,
         };
-        if next < 0 || next >= self.pipes.len() as isize { return None };
+        if next < 0 || next >= self.pipes.len() as isize {
+            return None;
+        };
         Some(next)
     }
 }
@@ -205,12 +226,13 @@ fn pt1(input: &str) -> Result<i32> {
     let mut count = 1;
     loop {
         count += 1;
-        let Some(next) = map.follow_pipe(prev, current) else { bail!("invalid path taken")};
+        let Some(next) = map.follow_pipe(prev, current) else {
+            bail!("invalid path taken")
+        };
         if let (Pipe::Start, _) = map.pipes[next as usize] {
             break;
         } else {
-            prev = current;
-            current = next;
+            (prev, current) = (current, next);
         }
     }
     Ok(count / 2)
@@ -223,14 +245,15 @@ fn pt2(input: &str) -> Result<i32> {
     // Mark the loop
     map.pipes[start as usize].1 = RelativePosition::Loop;
     loop {
-        let Some(next) = map.follow_pipe(prev, current) else { bail!("invalid path taken")};
+        let Some(next) = map.follow_pipe(prev, current) else {
+            bail!("invalid path taken")
+        };
         if let (Pipe::Start, _) = map.pipes[next as usize] {
             break;
         } else {
-            prev = current;
-            current = next;
+            (prev, current) = (current, next);
         }
-    };
+    }
 
     // Fill remaining unknowns with right/left - do a column starting from Start up and then down, and then do rows from top to bottom from column out
     let start_row = start / map.width;
@@ -245,7 +268,7 @@ fn pt2(input: &str) -> Result<i32> {
             match map.pipes.get_mut(idx as usize) {
                 Some((_, rel_pos @ (Rel::Left | Rel::Right))) => last = *rel_pos,
                 Some((_, rel_pos @ Rel::Unknown)) => *rel_pos = last,
-                None => last_row = true,  // Tried to get position past the grid - done iteration over rows
+                None => last_row = true, // Tried to get position past the grid - done iteration over rows
                 _ => (),
             };
             if row == 0 || last_row || col == 0 || col == map.width - 1 {
@@ -253,11 +276,21 @@ fn pt2(input: &str) -> Result<i32> {
                     outer = last;
                 }
             }
-            if last_row { break 'row; }
+            if last_row {
+                break 'row;
+            }
         }
     }
-    let inner = if outer == RelativePosition::Left { RelativePosition::Right } else { RelativePosition::Left };
-    Ok(map.pipes.into_iter().filter(|(_, rel_pos)| *rel_pos == inner).count() as i32)
+    let inner = if outer == RelativePosition::Left {
+        RelativePosition::Right
+    } else {
+        RelativePosition::Left
+    };
+    Ok(map
+        .pipes
+        .into_iter()
+        .filter(|(_, rel_pos)| *rel_pos == inner)
+        .count() as i32)
 }
 
 #[cfg(test)]

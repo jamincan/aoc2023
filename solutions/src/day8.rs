@@ -11,17 +11,19 @@ solution!(INPUT, pt1, pt2);
 #[derive(Clone, Copy)]
 enum Instruction {
     Left,
-    Right
+    Right,
 }
 
 fn parse_instructions(input: &str) -> Result<Vec<Instruction>> {
-    let instructions: Vec<Instruction> = input.trim().chars().map(|char| {
-        match char {
+    let instructions: Vec<Instruction> = input
+        .trim()
+        .chars()
+        .map(|char| match char {
             'L' => Ok(Instruction::Left),
             'R' => Ok(Instruction::Right),
-            _ => Err(anyhow::format_err!("invalid instruction '{char}'"))
-        }
-    }).collect::<Result<_>>()?;
+            _ => Err(anyhow::format_err!("invalid instruction '{char}'")),
+        })
+        .collect::<Result<_>>()?;
 
     Ok(instructions)
 }
@@ -29,23 +31,42 @@ fn parse_instructions(input: &str) -> Result<Vec<Instruction>> {
 fn parse_nodes(input: Lines) -> Result<HashMap<&str, (&str, &str)>> {
     let mut nodes = HashMap::new();
     for line in input {
-        let (id, next_elements) = line.split_once('=').context("unable to separate id from elements")?;
+        let (id, next_elements) = line
+            .split_once('=')
+            .context("unable to separate id from elements")?;
         let id = id.trim();
-        let next_elements = next_elements.trim().strip_prefix('(').context("no opening parenthesis")?;
-        let next_elements = next_elements.strip_suffix(')').context("no closing parenthesis")?;
-        let (a, b) = next_elements.split_once(", ").context("failed to split elements")?;
+        let next_elements = next_elements
+            .trim()
+            .strip_prefix('(')
+            .context("no opening parenthesis")?;
+        let next_elements = next_elements
+            .strip_suffix(')')
+            .context("no closing parenthesis")?;
+        let (a, b) = next_elements
+            .split_once(", ")
+            .context("failed to split elements")?;
         nodes.insert(id, (a, b));
     }
     Ok(nodes)
 }
 
-fn calculate_steps(nodes: &HashMap<&str, (&str, &str)>, mut instructions: impl Iterator<Item = Instruction>, start: &str, end_test: fn(&str) -> bool) -> Result<u64> {
+fn calculate_steps(
+    nodes: &HashMap<&str, (&str, &str)>,
+    mut instructions: impl Iterator<Item = Instruction>,
+    start: &str,
+    end_test: fn(&str) -> bool,
+) -> Result<u64> {
     let mut current = start;
     let mut steps = 0;
     while !end_test(current) {
         steps += 1;
-        let (left, right) = nodes.get(&current).with_context(|| format!("node '{current}' not found"))?;
-        match instructions.next().expect("instructions should cycle forever") {
+        let (left, right) = nodes
+            .get(&current)
+            .with_context(|| format!("node '{current}' not found"))?;
+        match instructions
+            .next()
+            .expect("instructions should cycle forever")
+        {
             Instruction::Left => current = *left,
             Instruction::Right => current = *right,
         }
@@ -57,7 +78,9 @@ fn pt1(input: &str) -> Result<u64> {
     let mut lines = input.trim().lines();
     let instructions = parse_instructions(lines.next().context("empty input")?)?;
     let instructions = instructions.into_iter().cycle();
-    let _empty_line = lines.next().context("no empty line separating instructions")?;
+    let _empty_line = lines
+        .next()
+        .context("no empty line separating instructions")?;
     let nodes = parse_nodes(lines)?;
 
     calculate_steps(&nodes, instructions, "AAA", |id| id == "ZZZ")
@@ -67,18 +90,25 @@ fn pt2(input: &str) -> Result<u64> {
     let mut lines = input.trim().lines();
     let instructions = parse_instructions(lines.next().context("empty input")?)?;
     let instructions = instructions.into_iter().cycle();
-    let _empty_line = lines.next().context("no empty line separating instructions")?;
+    let _empty_line = lines
+        .next()
+        .context("no empty line separating instructions")?;
     let nodes = parse_nodes(lines)?;
 
     let starting_node_steps: Vec<_> = nodes
         .keys()
         .filter(|id| id.ends_with('A'))
         .map(|node| {
-            calculate_steps(&nodes, instructions.clone(), *node, |node| node.ends_with('Z'))
+            calculate_steps(&nodes, instructions.clone(), *node, |node| {
+                node.ends_with('Z')
+            })
         })
         .collect::<Result<_>>()?;
 
-    let lcm = starting_node_steps.into_iter().reduce(|lcm, steps| num::Integer::lcm(&lcm, &steps)).context("no starting nodes")?;
+    let lcm = starting_node_steps
+        .into_iter()
+        .reduce(|lcm, steps| num::Integer::lcm(&lcm, &steps))
+        .context("no starting nodes")?;
     Ok(lcm)
 }
 
