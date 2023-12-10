@@ -78,6 +78,6 @@ mod test {
     #[test]
     fn real_input() {
         assert_eq!(super::pt1(super::INPUT).unwrap(), 2098530125);
-        // assert_eq!(super::pt2(super::INPUT).unwrap(), 30125202);
+        assert_eq!(super::pt2(super::INPUT).unwrap(), 1016);
     }
 }
