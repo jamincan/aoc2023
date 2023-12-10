@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 pub type Solution = fn() -> anyhow::Result<String>;
 pub type SolutionSet = (Solution, Solution);
 
@@ -56,6 +58,7 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
+mod day10;
 
 pub const SOLUTIONS: &[SolutionSet] = &[
     day1::SOLUTION,
@@ -67,4 +70,5 @@ pub const SOLUTIONS: &[SolutionSet] = &[
     day7::SOLUTION,
     day8::SOLUTION,
     day9::SOLUTION,
+    day10::SOLUTION,
 ];
